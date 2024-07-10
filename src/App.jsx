@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getJokes, useJokeService } from "./services/jokeService.js";
+import { deleteJoke, getJokes, updateToldStatus, useJokeService } from "./services/jokeService.jsx";
 import stevePic from "./assets/steve.png";
 
 export const App = () => {
@@ -9,6 +9,7 @@ export const App = () => {
   const [showToldJokes, setShowToldJokes] = useState([]);
   const [showUntoldJokes, setShowUntoldJokes] = useState([]);
 
+  // Get all jokes from database
   useEffect(() => {
     getJokes().then((jokesArray) => {
       setAllJokes(jokesArray);
@@ -16,6 +17,7 @@ export const App = () => {
     });
   }, []);
 
+  // Filter jokes by told and untold status
   useEffect(() => {
     const toldJokes = allJokes.filter((joke) => joke.told === true);
     setShowToldJokes(toldJokes);
@@ -25,9 +27,28 @@ export const App = () => {
     console.log("Untold Jokes:", untoldJokes);
   }, [allJokes]);
 
+  // Variables to get each list length
   const toldJokesCount = showToldJokes.length;
   const untoldJokesCount = showUntoldJokes.length;
 
+  // Function to toggle the told status of a joke
+  const handleToggleToldStatus = async (joke) => {
+    const editedJoke = { ...joke, told: !joke.told }
+    await updateToldStatus(editedJoke)
+
+    // Refresh the list of jokes
+    const updatedJokes = await getJokes()
+    setAllJokes(updatedJokes)
+  }
+
+  // Function to delete a joke from the list
+  const handleDelete = async (id) => {
+    await deleteJoke(id)
+    const updatedJokes = await getJokes()
+    setAllJokes(updatedJokes)
+  }
+
+  // TO DO: modularize all of this
   return (
     <div className="app-container">
       <header className="app-heading">
@@ -69,6 +90,8 @@ export const App = () => {
               {showUntoldJokes.map((joke) => (
                 <li className="joke-list-item" key={joke.id}>
                   <p className="joke-list-item-text">{joke.text}</p>
+                  <button onClick={() => handleDelete(joke.id)}>Delete</button>
+                  <button onClick={() => handleToggleToldStatus(joke)}>Told</button>
                 </li>
               ))}
             </ul>
@@ -83,6 +106,8 @@ export const App = () => {
               {showToldJokes.map((joke) => (
                 <li className="joke-list-item" key={joke.id}>
                   <p className="joke-list-item-text">{joke.text}</p>
+                  <button onClick={() => handleDelete(joke.id)}>Delete</button>
+                  <button onClick={() => handleToggleToldStatus(joke)}>Untold</button>
                 </li>
               ))}
             </ul>

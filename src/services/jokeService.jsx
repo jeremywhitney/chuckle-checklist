@@ -41,3 +41,21 @@ export const useJokeService = () => {
 
   return { jokeState, setText, setTold, postJoke };
 };
+
+// Function for editing a joke's told/untold status
+export const updateToldStatus = async (joke) => {
+  await fetch(`http://localhost:8088/jokes/${joke.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(joke),
+  });
+};
+
+// Function to delete a joek from the database
+export const deleteJoke = async (id) => {
+  await fetch(`http://localhost:8088/jokes/${id}`, {
+    method: "DELETE",
+  });
+};
