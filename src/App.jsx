@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { AllJokes, useJokeService } from "./services/jokeService.js";
+import { getJokes, useJokeService } from "./services/jokeService.js";
 import stevePic from "./assets/steve.png";
 
 export const App = () => {
@@ -10,7 +10,7 @@ export const App = () => {
   const [showUntoldJokes, setShowUntoldJokes] = useState([]);
 
   useEffect(() => {
-    AllJokes().then((jokesArray) => {
+    getJokes().then((jokesArray) => {
       setAllJokes(jokesArray);
       console.log("All Jokes:", jokesArray);
     });
@@ -18,12 +18,15 @@ export const App = () => {
 
   useEffect(() => {
     const toldJokes = allJokes.filter((joke) => joke.told === true);
-    const untoldJokes = allJokes.filter((joke) => joke.told === false);
     setShowToldJokes(toldJokes);
     console.log("Told Jokes:", toldJokes);
+    const untoldJokes = allJokes.filter((joke) => joke.told === false);
     setShowUntoldJokes(untoldJokes);
     console.log("Untold Jokes:", untoldJokes);
   }, [allJokes]);
+
+  const toldJokesCount = showToldJokes.length;
+  const untoldJokesCount = showUntoldJokes.length;
 
   return (
     <div className="app-container">
@@ -44,13 +47,23 @@ export const App = () => {
             setText(event.target.value);
           }}
         />
-        <button className="joke-input-submit" onClick={postJoke}>
+        <button
+          className="joke-input-submit"
+          onClick={async () => {
+            await postJoke();
+            getJokes().then((jokesArray) => {
+              setAllJokes(jokesArray);
+            });
+          }}
+        >
           Add
         </button>
       </div>
       <div className="joke-lists-container">
         <div className="joke-list-container">
-          <h2>Untold</h2>
+          <h2>
+            Untold <span className="untold-count">{untoldJokesCount}</span>
+          </h2>
           <div>
             <ul>
               {showUntoldJokes.map((joke) => (
@@ -62,7 +75,9 @@ export const App = () => {
           </div>
         </div>
         <div className="joke-list-container">
-          <h2>Told</h2>
+          <h2>
+            Told <span className="told-count">{toldJokesCount}</span>
+          </h2>
           <div>
             <ul>
               {showToldJokes.map((joke) => (

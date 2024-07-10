@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 // Function to store ALL jokes from database
-export const AllJokes = async () => {
+export const getJokes = async () => {
   const response = await fetch("http://localhost:8088/jokes");
   const data = await response.json();
   return data;
@@ -28,8 +28,8 @@ export const useJokeService = () => {
     }));
   };
 
-  const postJoke = () => {
-    fetch("http://localhost:8088/jokes", {
+  const postJoke = async () => {
+    await fetch("http://localhost:8088/jokes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
