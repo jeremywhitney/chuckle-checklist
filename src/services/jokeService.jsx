@@ -7,7 +7,7 @@ export const getJokes = async () => {
   return data;
 };
 
-// Function for posting a new joke to the database
+// Function for posting a new joke
 export const useJokeService = () => {
   const [jokeState, setJokeState] = useState({
     text: "",
@@ -21,13 +21,15 @@ export const useJokeService = () => {
     }));
   };
 
-  const setTold = (newTold) => {
-    setJokeState((prevState) => ({
-      ...prevState,
-      told: newTold,
-    }));
-  };
+  // Don't think I need this. Save for now and delete later.
+  // const setTold = (newTold) => {
+  //   setJokeState((prevState) => ({
+  //     ...prevState,
+  //     told: newTold,
+  //   }));
+  // };
 
+  // Function for posting a new joke to the database
   const postJoke = async () => {
     await fetch("http://localhost:8088/jokes", {
       method: "POST",
@@ -39,7 +41,7 @@ export const useJokeService = () => {
     setText("");
   };
 
-  return { jokeState, setText, setTold, postJoke };
+  return { jokeState, setText, postJoke };
 };
 
 // Function for editing a joke's told/untold status
@@ -53,7 +55,7 @@ export const updateToldStatus = async (joke) => {
   });
 };
 
-// Function to delete a joek from the database
+// Function to delete a joke from the database
 export const deleteJoke = async (id) => {
   await fetch(`http://localhost:8088/jokes/${id}`, {
     method: "DELETE",
